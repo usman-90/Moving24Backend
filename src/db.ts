@@ -9,7 +9,7 @@ const client = new MongoClient(url, {
   },
 });
 
-export async function database_connection(moving24_collections: any[]) {
+export async function database_connection(moving24_collections: any[]) : Promise<any[] | undefined>{
   try {
     await client.connect();
     const db = client.db("Moving24");
@@ -23,5 +23,6 @@ export async function database_connection(moving24_collections: any[]) {
       "Error occurred while connecting to MongoDB Atlas...\n",
       error,
     );
+    return
   }
 }
