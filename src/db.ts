@@ -1,8 +1,8 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 
 const url = process.env.DATABASE_URL ?? "";
-
-const client = new MongoClient(url, {
+console.log(url)
+const client = new MongoClient("mongodb+srv://salman:4lanHyMRdCrtXDJ7@startbikes.nglnioh.mongodb.net/", {
   serverApi: {
     version: ServerApiVersion.v1,
     deprecationErrors: true,

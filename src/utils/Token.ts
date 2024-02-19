@@ -1,19 +1,12 @@
-import jwt from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
 
-export const createToken = async (user : any) => {
-  let userName = user.userName;
-  let email = user.email;
-  let token: string = "";
-  if (userName) {
-    token = await jwt.sign(
-      { userName: user.userName, userId: user._id },
-      process.env.JWT_PASSWORD,
+console.log(jwt)
+export const createToken = async (email: string, _id: string) => {
+    let token: string = "";
+    let secret : Secret = process.env.JWT_SECRET || "20934u029nfajdn"
+    token = jwt.sign(
+        { email: email, userId: _id },
+        secret,
     );
-  } else if (email) {
-    token = await jwt.sign(
-      { email: user.email, userId: user._id },
-      process.env.JWT_PASSWORD,
-    );
-  }
-  return token;
+    return token;
 };
