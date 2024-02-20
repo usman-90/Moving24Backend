@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -40,9 +40,15 @@ export class AuthController {
     }
 
     @HttpCode(HttpStatus.OK)
-    @Post('customer/signUp')
+    @Post('sendVerificationCode')
     customerSignUp(@Body() signInDto: Record<string, any>) {
-        return this.authService.signUp(signInDto.password, signInDto.email, signInDto.name);
+        const randomNum = Math.random() * 9000
+        return this.authService.sendVerificationEmail(signInDto.email, Math.floor(1000 + randomNum).toString());
     }
 
+    @HttpCode(HttpStatus.OK)
+    @Post('verifyCode')
+    verifyCode(@Body() signInDto: Record<string, any>) {
+        return this.authService.verifyCode(signInDto.email, signInDto.code);
+    }
 }

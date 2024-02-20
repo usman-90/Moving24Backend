@@ -64,6 +64,85 @@ export class UsersService {
             throw new InternalServerErrorException()
         }
     }
+
+    async updateUserCodeByEmail(email: string, code: string): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["User"])
+            if (!collections) {
+                throw new InternalServerErrorException()
+            }
+            const userCollection = collections[0]
+            const update = userCollection.updateOne(
+                { email: email },
+                { $set: { "code": code, verified: false } }
+            )
+            return update
+
+        } catch (e) {
+            throw new InternalServerErrorException()
+        }
+    }
+
+    async insertOneCustomer(email: string, code: string): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["User"])
+            if (!collections) {
+                return
+            }
+            const userCollection = collections[0]
+            const result = userCollection.insertOne({
+                email,
+                code,
+                verified: false
+            })
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+    async getUserCode(email: string): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["User"])
+            if (!collections) {
+                return
+            }
+            const userCollection = collections[0]
+            const result = userCollection.findOne({
+                email,
+            }, {
+                code: 1,
+                email: 1
+            })
+            return result
+
+        } catch (e) {
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+    async setVerifiedTrue(email: string): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["User"])
+            if (!collections) {
+                throw new InternalServerErrorException()
+            }
+            const userCollection = collections[0]
+            const update = userCollection.updateOne(
+                { email: email },
+                { $set: { "verified": true } }
+            )
+            return update
+
+        } catch (e) {
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
 }
 
 
