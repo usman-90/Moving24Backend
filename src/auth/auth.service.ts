@@ -29,8 +29,8 @@ export class AuthService {
 
     }
 
-    async signUp(password: string, email: string, name: string) {
-        const insertedUser = await this.userService.insertOneUser(name, email, password)
+    async signUp(userData: any) {
+        const insertedUser = await this.userService.insertOneUser(userData)
         if (!insertedUser) {
             throw new ServiceUnavailableException()
         }
