@@ -13,8 +13,7 @@ import { ValidateSignUpData } from 'src/middlewares/ValidatePartnerSignUp.middle
     imports: [UsersModule,
         JwtModule.register({
             global: true,
-            secret: process.env.JWT_SECRET || "dajsdkh823948dk",
-            signOptions: { expiresIn: '60s' },
+            secret:"skdfansoafnwoaienMOVING24ladnflansdjlnlj@__@_12390" ,
         }),
     ],
     controllers: [AuthController],
