@@ -16,27 +16,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Post('partnerSignUp')
     partnerSignUp(@Body() signInDto: Record<string, any>) {
-        let userData = {
-            email: signInDto.email,
-            password: signInDto.password,
-            removalType: signInDto.removalType,
-            areaPreference: signInDto.areaPreference,
-            location: signInDto.location,
-            radius: signInDto.radius,
-            companyName: signInDto.companyName,
-            businessType: signInDto.businessType,
-            noOfEmployees: signInDto.noOfEmployees,
-            telephone: signInDto.telephone,
-            addressLine1: signInDto.addressLine1,
-            city: signInDto.city,
-            state: signInDto.state,
-            salutation: signInDto.salutation,
-            firstName: signInDto.firstName,
-            lastName: signInDto.lastName,
-            userName: signInDto.userName,
-        }
-
-        return this.authService.partnerSignUp(userData);
+        return this.authService.partnerSignUp(signInDto);
     }
 
     @HttpCode(HttpStatus.OK)

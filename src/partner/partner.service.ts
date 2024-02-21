@@ -25,4 +25,23 @@ export class PartnerService {
             throw new InternalServerErrorException()
         }
     }
+
+    async getPartnerByEmail (email: string) : Promise <any | undefined> {
+        try{
+            const collections = await database_connection(["Partner"])
+
+            if (!collections) {
+                return
+            }
+            const partnerCollection = collections[0]
+            const result = partnerCollection.findOne({
+                email,
+            })
+            return result
+        }catch(e){
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
 }
