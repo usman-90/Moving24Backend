@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerService } from 'src/mailer/mailer.service';
+import { PartnerService } from 'src/partner/partner.service';
 
 @Module({
     imports: [UsersModule,
@@ -14,8 +15,8 @@ import { MailerService } from 'src/mailer/mailer.service';
             signOptions: { expiresIn: '60s' },
         }),
     ],
-  controllers: [AuthController],
-  providers: [AuthService,MailerService]
+    controllers: [AuthController],
+    providers: [AuthService, MailerService, PartnerService]
 })
 export class AuthModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

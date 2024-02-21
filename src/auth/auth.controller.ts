@@ -14,8 +14,8 @@ export class AuthController {
 
 
     @HttpCode(HttpStatus.OK)
-    @Post('signUp')
-    signUp(@Body() signInDto: Record<string, any>) {
+    @Post('partnerSignUp')
+    partnerSignUp(@Body() signInDto: Record<string, any>) {
         let userData = {
             email: signInDto.email,
             password: signInDto.password,
@@ -36,7 +36,7 @@ export class AuthController {
             userName: signInDto.userName,
         }
 
-        return this.authService.signUp(userData);
+        return this.authService.partnerSignUp(userData);
     }
 
     @HttpCode(HttpStatus.OK)

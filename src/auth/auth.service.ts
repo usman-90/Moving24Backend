@@ -3,13 +3,14 @@ import { UsersService } from 'src/users/users.service';
 import { comparePassword } from 'src/utils/hashPassword';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from 'src/mailer/mailer.service';
+import { PartnerService } from 'src/partner/partner.service';
 
 
 
 
 @Injectable()
 export class AuthService {
-    constructor(private userService: UsersService, private mailerService: MailerService, private jwtService: JwtService) { }
+    constructor(private userService: UsersService, private mailerService: MailerService, private jwtService: JwtService , private partnerService : PartnerService) { }
 
     async signIn(password: string, email: string) {
         const user = await this.userService.findOneUserByEmail(email)
@@ -30,19 +31,14 @@ export class AuthService {
 
     }
 
-    async signUp(userData: any) {
-        const insertedUser = await this.userService.insertOneUser(userData)
+    async partnerSignUp(userData: any) {
+        const insertedUser = await this.partnerService.insertOnePartner(userData)
         if (!insertedUser) {
             throw new ServiceUnavailableException()
         }
-        const user = await this.userService.findOneUserById(insertedUser?.insertedId.toString())
-
-        if (!user) {
-            throw new ServiceUnavailableException()
-        }
         const token = await this.jwtService.signAsync({
-            email: user.email,
-            _id: user._id
+            email: userData.email,
+            _id: insertedUser?.insertedId.toString()
         })
 
         return token

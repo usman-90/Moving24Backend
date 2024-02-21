@@ -7,9 +7,10 @@ import { AuthModule } from './auth/auth.module';
 import { UsersService } from './users/users.service';
 import { UsersModule } from './users/users.module';
 import { MailerService } from './mailer/mailer.service';
+import { PartnerModule } from './partner/partner.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UsersModule],
+  imports: [ConfigModule.forRoot(), AuthModule, UsersModule, PartnerModule],
   controllers: [AppController, Moving24Controller],
   providers: [AppService, UsersService, MailerService],
 })
