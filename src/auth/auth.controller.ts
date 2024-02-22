@@ -23,7 +23,7 @@ export class AuthController {
     @Post('sendVerificationCode')
     customerSignUp(@Body() signInDto: Record<string, any>) {
         const randomNum = Math.random() * 9000
-        return this.authService.sendVerificationEmail(signInDto.email, Math.floor(1000 + randomNum).toString());
+        return this.authService.sendVerificationEmailToUser(signInDto.email, Math.floor(1000 + randomNum).toString());
     }
 
     @HttpCode(HttpStatus.OK)

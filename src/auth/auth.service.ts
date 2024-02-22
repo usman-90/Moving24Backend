@@ -44,7 +44,7 @@ export class AuthService {
         return token
     }
 
-    async sendVerificationEmail(email: string, code: string) {
+    async sendVerificationEmailToUser(email: string, code: string) {
         await this.mailerService.sendMain({
             subject: "Moving 24 Verification",
             text: "Your verification code is " + code,
