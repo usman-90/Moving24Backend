@@ -24,7 +24,8 @@ export class AuthService {
 
         const token = await this.jwtService.signAsync({
             email: user.email,
-            _id: user._id
+            _id: user._id.toString(),
+            roles: ["partner"],
         })
 
         return token
@@ -38,7 +39,8 @@ export class AuthService {
         }
         const token = await this.jwtService.signAsync({
             email: userData.email,
-            _id: insertedUser?.insertedId.toString()
+            _id: insertedUser?.insertedId.toString(),
+            roles: ["partner"],
         })
 
         return token

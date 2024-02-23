@@ -9,7 +9,6 @@ export class CheckPartnerEmailMiddleware implements NestMiddleware {
         const email = req.body.email;
         const user = this.parnterService.getPartnerByEmail(email);
         const userRes = await user;
-        console.log(userRes)
         if (userRes) {
             res.status(400).json({ message: 'Email already exists' });
             return;

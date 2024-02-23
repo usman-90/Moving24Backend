@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 export class ValidateSignUpData implements NestMiddleware {
     constructor() { }
     async use(req: Request, res: Response, next: NextFunction) {
+        console.log(req.body,"middle")
         const {body} = req
         const temp : any = {
             email: body.email,
