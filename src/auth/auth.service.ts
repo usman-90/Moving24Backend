@@ -10,7 +10,7 @@ import { PartnerService } from 'src/partner/partner.service';
 
 @Injectable()
 export class AuthService {
-    constructor(private userService: UsersService, private mailerService: MailerService, private jwtService: JwtService , private partnerService : PartnerService) { }
+    constructor(private userService: UsersService, private mailerService: MailerService, private jwtService: JwtService, private partnerService: PartnerService) { }
 
     async signIn(password: string, email: string) {
         const user = await this.userService.findOneUserByEmail(email)
@@ -55,27 +55,35 @@ export class AuthService {
         })
 
         const user = await this.userService.findOneUserByEmail(email)
-        if (user){
-            await this.userService.updateUserCodeByEmail(email,code)
-        }else{
-            await this.userService.insertOneCustomer(email,code)
+        if (user) {
+            await this.userService.updateUserCodeByEmail(email, code)
+        } else {
+            await this.userService.insertOneCustomer(email, code)
         }
 
         return true
     }
 
-    async verifyCode(email: string, code : string){
+    async verifyCode(email: string, code: string) {
         const user = await this.userService.getUserCode(email)
-        if (user.code === code){
+        if (user.code === code) {
             const res = await this.userService.setVerifiedTrue(email)
+            const token = await this.jwtService.signAsync({
+                email: user?.email,
+                _id: user?._id?.toString(),
+                roles: ["user"],
+            })
             return {
-                user,
+                user:{
+                    ...user,
+                    token,
+                },
                 res,
                 verified: true
             }
-        }else{
+        } else {
             throw new BadRequestException({
-                message:"wrong code"
+                message: "wrong code"
             })
         }
     }

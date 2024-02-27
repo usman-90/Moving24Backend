@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Req, U
 import { UsersService } from './users.service';
 import { QuotesService } from 'src/quotes/quotes.service';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('users')
 export class UsersController {
@@ -9,7 +10,7 @@ export class UsersController {
 
 
 
-    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard, RolesGuard)
     @HttpCode(HttpStatus.OK)
     @Post("quoteRequest")
     quoteRequest(@Body() body: Record <string, any>, @Req() req : any) {
@@ -24,8 +25,8 @@ export class UsersController {
         name: body.name,
         email:req.user.email,
         wappNum: body.wappNum,
-        minBudgetRange: body.minbudgetRange,
-        maxBudgetRange: body.maxbudgetRange,
+        minBudgetRange: body.budgetRange.minimum,
+        maxBudgetRange: body.budgetRange.maximum,
         building: body.building,
         requestTime : new Date()
     }
