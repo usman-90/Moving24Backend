@@ -56,7 +56,8 @@ export class PartnerController {
             ans1:1,
             ans2:1,
             ans3:1,
-            EIN:1
+            EIN:1,
+            images:1
         };
         const res = await this.partnerService.getPartnerById(query?.id, projectionObj)
         return res
