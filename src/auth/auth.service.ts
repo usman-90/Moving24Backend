@@ -13,7 +13,15 @@ export class AuthService {
     constructor(private userService: UsersService, private mailerService: MailerService, private jwtService: JwtService, private partnerService: PartnerService) { }
 
     async signIn(password: string, email: string) {
-        const user = await this.userService.findOneUserByEmail(email)
+        let projectionObj = {
+            email: 1,
+            firstName: 1,
+            lastName: 1,
+            proof: 1,
+            password:1
+        }
+        const user = await this.partnerService.getPartnerByEmail(email, projectionObj)
+        console.log("me chala", user)
         if (!user) {
             throw new NotFoundException()
         }
@@ -27,8 +35,17 @@ export class AuthService {
             _id: user._id.toString(),
             roles: ["partner"],
         })
-
-        return token
+        delete user.password
+        if (Object.keys(user?.proof)?.length){
+            user.proof = true 
+        }else{
+            user.proof = false 
+        }
+        return {
+            ...user,
+            token,
+            isPartner:true
+        }
 
     }
 
@@ -74,7 +91,7 @@ export class AuthService {
                 roles: ["user"],
             })
             return {
-                user:{
+                user: {
                     ...user,
                     token,
                 },

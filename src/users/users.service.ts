@@ -20,7 +20,7 @@ export class UsersService {
                 return
             }
             const userCollection = collections[0]
-            const result = userCollection.findOne({ email: email })
+            const result = userCollection.findOne({ email: email },{password:0})
             return result
         } catch (e) {
             console.log(e)

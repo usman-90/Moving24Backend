@@ -1,4 +1,5 @@
-import { Injectable , InternalServerErrorException} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
 import { database_connection } from 'src/db';
 import { hashPassword } from 'src/utils/hashPassword';
 
@@ -17,7 +18,10 @@ export class PartnerService {
             const hashedPassword = await hashPassword(password)
             const result = userCollection.insertOne({
                 ...otherData,
-                password: hashedPassword
+                password: hashedPassword,
+                proof: {},
+                about:"",
+                images:[]
             })
             return result
         } catch (e) {
@@ -26,54 +30,100 @@ export class PartnerService {
         }
     }
 
-    async getPartnerByEmail (email: string) : Promise <any | undefined> {
-        try{
-            const collections = await database_connection(["Partner"])
+    async getPartnerById(id: string, projectionObj: any = {}): Promise<any | undefined> {
+        try {
 
+            const collections = await database_connection(["Partner"])
             if (!collections) {
                 return
             }
             const partnerCollection = collections[0]
-            const result = partnerCollection.findOne({
-                email,
-            })
+            console.log(projectionObj)
+            const result = partnerCollection.findOne(
+                { _id:  new ObjectId(id) },
+                { projection: projectionObj }
+            );
             return result
-        }catch(e){
+        } catch (e) {
             console.log(e)
             throw new InternalServerErrorException()
         }
     }
 
 
-    async insertPartnerProofs (email: string , data: any) : Promise <any | undefined> {
-        try{
+    async updatePartnerDetails(id: string, body : any ): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["Partner"])
+            if (!collections) {
+                return
+            }
+            const partnerCollection = collections[0]
+            const result = partnerCollection.updateOne(
+                { _id: new ObjectId(id)},
+                {
+                    $set: body
+                }
+            );
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+    async getPartnerByEmail(email: string, projectionObj: any = {}): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["Partner"])
+            if (!collections) {
+                return
+            }
+            const partnerCollection = collections[0]
+            console.log(projectionObj)
+            const result = partnerCollection.findOne(
+                { email },
+                { projection: projectionObj }
+            );
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+    async insertPartnerProofs(email: string, data: any): Promise<any | undefined> {
+        try {
             const collections = await database_connection(["Partner"])
 
             if (!collections) {
                 return
             }
             const partnerCollection = collections[0]
-            console.log(data,"prooofssssss")
+            console.log(data, "prooofssssss")
             const result = partnerCollection.updateOne({
                 email,
-            },{
+            }, {
                 $set: {
                     "proof.license": data.license,
-                    "proof.VATcert" : data.VATcert,
-                    "proof.emiratesId" : data.emiratesId,
-                    "proof.insuranceCert" : data.insuranceCert,
+                    "proof.VATcert": data.VATcert,
+                    "proof.emiratesId": data.emiratesId,
+                    "proof.insuranceCert": data.insuranceCert,
                 }
             })
             return result
-        }catch(e){
+        } catch (e) {
             console.log(e)
             throw new InternalServerErrorException()
         }
     }
 
 
-    async getPartnerProofs (email: string) : Promise <any | undefined> {
-        try{
+    async getPartnerProofs(email: string): Promise<any | undefined> {
+        try {
             const collections = await database_connection(["Partner"])
 
             if (!collections) {
@@ -82,11 +132,11 @@ export class PartnerService {
             const partnerCollection = collections[0]
             const result = partnerCollection.findOne({
                 email,
-            },{
+            }, {
                 proof: 1
             })
             return result
-        }catch(e){
+        } catch (e) {
             console.log(e)
             throw new InternalServerErrorException()
         }

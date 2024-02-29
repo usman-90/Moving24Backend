@@ -6,7 +6,7 @@ export class AuthController {
     constructor(private authService: AuthService) { }
 
     @HttpCode(HttpStatus.OK)
-    @Post('login')
+    @Post('partnerLogin')
     signIn(@Body() signInDto: Record<string, any>) {
         return this.authService.signIn(signInDto.password, signInDto.email);
     }
