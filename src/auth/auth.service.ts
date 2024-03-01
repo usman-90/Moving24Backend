@@ -60,7 +60,15 @@ export class AuthService {
             roles: ["partner"],
         })
 
-        return token
+        return {
+            email: userData.email,
+            _id: insertedUser?.insertedId.toString(),
+            token,
+            isPartner:true,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            proof: false
+        }
     }
 
     async sendVerificationEmailToUser(email: string, code: string) {
