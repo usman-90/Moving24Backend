@@ -20,8 +20,8 @@ export class PartnerService {
                 ...otherData,
                 password: hashedPassword,
                 proof: {},
-                about:"",
-                images:[]
+                about: "",
+                images: []
             })
             return result
         } catch (e) {
@@ -40,7 +40,7 @@ export class PartnerService {
             const partnerCollection = collections[0]
             console.log(projectionObj)
             const result = partnerCollection.findOne(
-                { _id:  new ObjectId(id) },
+                { _id: new ObjectId(id) },
                 { projection: projectionObj }
             );
             return result
@@ -51,7 +51,7 @@ export class PartnerService {
     }
 
 
-    async updatePartnerDetails(id: string, body : any ): Promise<any | undefined> {
+    async updatePartnerDetails(id: string, body: any): Promise<any | undefined> {
         try {
 
             const collections = await database_connection(["Partner"])
@@ -60,7 +60,7 @@ export class PartnerService {
             }
             const partnerCollection = collections[0]
             const result = partnerCollection.updateOne(
-                { _id: new ObjectId(id)},
+                { _id: new ObjectId(id) },
                 {
                     $set: body
                 }
@@ -141,5 +141,61 @@ export class PartnerService {
             throw new InternalServerErrorException()
         }
     }
+
+
+    async saveToPartner(id: string, emails: string[]): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["PRjunction"])
+            if (!collections) {
+                return
+            }
+            const PRjunctionCollection = collections[0]
+            const tempObjs = emails.map((email: string) => {
+                return {
+                    partnerEmail: email,
+                    quoteId: id
+                }
+            })
+            const result = PRjunctionCollection.insertMany(tempObjs);
+
+            return result
+
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+    async get5PartnerQuotes(email: string): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["PRjunction", "Request"])
+            if (!collections) {
+                return
+            }
+            const PRjunctionCollection = collections[0]
+            const requestCollection = collections[1]
+            const res = await PRjunctionCollection.find({ partnerEmail: email }).toArray()
+            const reqIds = res.map((elem: any) => new ObjectId(elem?.quoteId))
+            console.log(reqIds, "idssssss")
+            const quotes = requestCollection
+                .find({ _id: { $in: reqIds } })
+                .limit(10) 
+                .sort({ date: 1 })
+                .toArray()
+
+            return quotes
+
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
 
 }

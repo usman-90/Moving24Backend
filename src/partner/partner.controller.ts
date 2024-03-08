@@ -57,11 +57,28 @@ export class PartnerController {
             ans2:1,
             ans3:1,
             EIN:1,
-            images:1
+            images:1,
+            regions:1
         };
         const res = await this.partnerService.getPartnerById(query?.id, projectionObj)
         return res
     }
+
+
+
+
+    @HttpCode(HttpStatus.OK)
+    @Get("getrecentpartnerreqs")
+    async getPartnerRequests(@Query() query: Record<string, any>) {
+        console.log(query)
+        const res = await this.partnerService.get5PartnerQuotes(query?.email)
+        return res
+    }
+
+
+
+
+
 
 
 }
