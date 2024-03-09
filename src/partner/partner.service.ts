@@ -21,7 +21,10 @@ export class PartnerService {
                 password: hashedPassword,
                 proof: {},
                 about: "",
-                images: []
+                images: [],
+                isVerified: false,
+                createdAt: new Date(),
+                profileImage: ""
             })
             return result
         } catch (e) {
@@ -71,6 +74,37 @@ export class PartnerService {
             throw new InternalServerErrorException()
         }
     }
+
+
+    async updatePartnerPassword(id: string, body: any): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["Partner"])
+            if (!collections) {
+                return
+            }
+            console.log(body)
+            const partnerCollection = collections[0]
+            const result = partnerCollection.updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $set: {
+                        password: await hashPassword(body.password)
+                    } 
+                }
+            );
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+
+
+
 
 
 
@@ -183,7 +217,7 @@ export class PartnerService {
             console.log(reqIds, "idssssss")
             const quotes = requestCollection
                 .find({ _id: { $in: reqIds } })
-                .limit(10) 
+                .limit(5)
                 .sort({ date: 1 })
                 .toArray()
 
@@ -197,5 +231,36 @@ export class PartnerService {
     }
 
 
+    async getPartnerQuotes(email: string, pageNo: string, fromDate: string, toDate: string, searchQuery: string): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["PRjunction", "Request"])
+            if (!collections) {
+                return
+            }
+            const PRjunctionCollection = collections[0]
+            const requestCollection = collections[1]
+            const res = await PRjunctionCollection.find({ partnerEmail: email }).toArray()
+            const reqIds = res.map((elem: any) => new ObjectId(elem?.quoteId))
+            const newFromDate = new Date(fromDate)
+            const newToDate = new Date(toDate)
+            const query : any = {
+                "_id": { "$in": reqIds },
+            }
+            if (searchQuery) {
+                query["name"] = { "$regex": searchQuery, "$options": "i" }
+            }
+            if (!isNaN(newFromDate.getTime()) && !isNaN(newToDate.getTime())) {
+                query["requestTime"] = { "$gte": newFromDate, "$lte": newToDate }
+            }
+            const quotes = await requestCollection.find(query).skip(parseInt(pageNo) * 10).limit(10).toArray();
+            return {quotes:quotes,total: reqIds.length}
+
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
 
 }

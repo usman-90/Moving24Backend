@@ -30,6 +30,41 @@ export class PartnerController {
 
 
 
+
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(["partner"])
+    @HttpCode(HttpStatus.OK)
+    @Put("updatepartnerpassword")
+    async updatePartnerPassword(@Body() body: Record<string, any>, @Req() req: any) {
+        const res = await this.partnerService.updatePartnerPassword(req.user._id, body)
+        return res
+    }
+
+
+
+
+
+
+
+    @HttpCode(HttpStatus.OK)
+    @Get("getPartnerOverview")
+    async getPartnerOverview(@Query() query: Record<string, any>) {
+        let projectionObj = {
+            _id: 1,
+            email: 1,
+            areaPreference: 1,
+            companyName: 1,
+            location: 1,
+            radius: 1,
+            regions:1,
+            isVerified:1
+        };
+        const res = await this.partnerService.getPartnerById(query?.id, projectionObj)
+        return res
+    }
+
+
     @HttpCode(HttpStatus.OK)
     @Get("getOnePartner")
     async getOnePartnerById(@Query() query: Record<string, any>) {
@@ -58,7 +93,8 @@ export class PartnerController {
             ans3:1,
             EIN:1,
             images:1,
-            regions:1
+            regions:1,
+            profileImage:1,
         };
         const res = await this.partnerService.getPartnerById(query?.id, projectionObj)
         return res
@@ -76,6 +112,13 @@ export class PartnerController {
     }
 
 
+    @HttpCode(HttpStatus.OK)
+    @Get("getpartnerquotes")
+    async getParnterQuotes(@Query() query: Record<string, any>) {
+        console.log(query)
+        const res = this.partnerService.getPartnerQuotes(query?.email, query?.pageNo, query?.fromDate, query?.toDate, query?.searchQuery)
+        return res
+    }
 
 
 

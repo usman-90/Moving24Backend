@@ -17,8 +17,8 @@ export class UsersController {
     let temp : any = {
         moveFrom: body.moveFrom,
         moveTo: body.moveTo,
-        currPropertyType: body.currentPropertyType,
-        currPropertyBedrooms: body.currentPropertyBedrooms,
+        currPropertyType: body.currPropertyType,
+        currPropertyBedrooms: body.currPropertyBedrooms,
         newPropertyType: body.newPropertyType,
         newPropertyAdditionalInfo: body.newPropertyAdditionalInfo,
         movingDatePref: body.movingDatePref,
