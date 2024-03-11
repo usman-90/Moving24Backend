@@ -40,13 +40,67 @@ export class QuotesService {
             }
             const requestCollection = collections[0]
 
-            const result = await requestCollection.findOne({_id: new ObjectId(id)})
+            const result = await requestCollection.findOne({ _id: new ObjectId(id) })
 
 
             return result
 
         } catch (e) {
 
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+    async getAllRequest(setNo: number, projectObj: any) {
+        try {
+
+            let limit = 10
+            let skip = (setNo - 1) * limit
+
+
+            const collections = await database_connection(["Request"])
+            if (!collections) {
+                throw new InternalServerErrorException()
+            }
+            const requestCollection = collections[0]
+
+            const [result, totalCount] = await Promise.all([
+                requestCollection.aggregate([
+                    { $match: {} },
+                    { $project: projectObj },
+                    { $sort: { requestTime: -1 } },
+                    { $skip: skip },
+                    { $limit: limit },
+                ]).toArray(),
+                requestCollection.countDocuments({})
+            ]);
+
+            return { result, totalCount }
+
+        } catch (e) {
+
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+    async updateRequest(id: string, body: any): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["Request"])
+            if (!collections) {
+                return
+            }
+            const requestCollection = collections[0]
+            const result = requestCollection.updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $set: body
+                }
+            );
+            return result
+        } catch (e) {
             console.log(e)
             throw new InternalServerErrorException()
         }
@@ -100,10 +154,10 @@ export class QuotesService {
                 latitude: toLat,
                 longitude: toLng
             }
-            if (isPointInPolygon(point1, coordinates)){
+            if (isPointInPolygon(point1, coordinates)) {
                 isPoint1Inside = true
             }
-            if (isPointInPolygon(point2, coordinates)){
+            if (isPointInPolygon(point2, coordinates)) {
                 isPoint2Inside = true
             }
             if (isPoint1Inside && isPoint2Inside) {
@@ -127,16 +181,16 @@ export class QuotesService {
             const partners = await partnerCollection.find({}).toArray()
 
             let emails: any[] = []
-            console.log(fromLat,fromLng,toLat, toLng,"LATTTTTTTTTTTTT")
+            console.log(fromLat, fromLng, toLat, toLng, "LATTTTTTTTTTTTT")
             await Promise.all(partners.map(async (partner: any) => {
                 if (partner?.areaPreference === "region") {
                     const regions = partner.regions.map((reg: any) => reg.name)
-                    console.log(regions,partner.email)
+                    console.log(regions, partner.email)
                     const regionPolygons = await this.regionService.getPolygon(regions)
                     regionPolygons.forEach((polygon: any) => {
 
                         console.log(this.arePointsInsideAnyPolygon(fromLat, fromLng, toLat, toLng, polygon.multiPolygon))
-                        console.log(fromLat, fromLng, toLat, toLng,polygon.name, polygon.multiPolygon)
+                        console.log(fromLat, fromLng, toLat, toLng, polygon.name, polygon.multiPolygon)
                         if (this.arePointsInsideAnyPolygon(fromLat, fromLng, toLat, toLng, polygon.multiPolygon)) {
                             emails.push(partner.email)
                         }
@@ -150,7 +204,7 @@ export class QuotesService {
                         partner.radius * 1609.34
                     );
                     const isPointTwoInRadius = isPointWithinRadius(
-                        { latitude: toLat, longitude: toLng},
+                        { latitude: toLat, longitude: toLng },
                         { latitude: latLng?.lat, longitude: latLng?.lng },
                         partner.radius * 1609.34
                     );

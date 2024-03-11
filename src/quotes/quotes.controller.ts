@@ -22,6 +22,9 @@ export class QuotesController {
             const toLatLng = await this.regionService.getLatLng(body.moveTo)
 
             const emails = await this.quoteService.getPartnerEmails(fromLatLng?.lat, fromLatLng?.lng, toLatLng?.lat, toLatLng?.lng)
+            await this.quoteService.updateRequest(body.id, {
+                availablePartners: emails?.length
+            })
             if (!emails.length) {
                 return {
                     message: "No partners available"

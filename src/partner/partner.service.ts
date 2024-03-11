@@ -54,6 +54,71 @@ export class PartnerService {
     }
 
 
+
+    async verifyDocument(id: string, key: any): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["Partner"])
+            if (!collections) {
+                return
+            }
+            console.log(key)
+            let query: any = {}
+            switch (key) {
+                case "VATcert":
+                    query = { isVATcertVerified: true }
+                    break;
+                case "emiratesId":
+                    query = { isEmiratesIdVerified: true }
+                    break;
+                case "insuranceCert":
+                    query = { isInsuranceCertVerified: true }
+                    break;
+                case "license":
+                    query = { isLicenseVerified: true }
+                    break;
+            }
+            const partnerCollection = collections[0]
+
+            const result = await partnerCollection.updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $set: query
+                }
+            );
+            if (result?.modifiedCount === 1) {
+                var res = await partnerCollection.findOne(
+                    { _id: new ObjectId(id) },
+                    {
+                        isVATcertVerified: 1,
+                        isEmiratesIdVerified: 1,
+                        isInsuranceCertVerified: 1,
+                        isLicenseVerified: 1
+                    }
+                );
+                if (res.isVATcertVerified && res.isEmiratesIdVerified && res.isInsuranceCertVerified && res.isLicenseVerified) {
+                    var res2 = await partnerCollection.updateOne(
+                        { _id: new ObjectId(id) },
+                        {
+                            $set: {
+                                isVerified: true
+                            }
+                        }
+                    );
+
+                }
+                console.log(res)
+            }
+            return [result, res2]
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+
     async updatePartnerDetails(id: string, body: any): Promise<any | undefined> {
         try {
 
@@ -90,7 +155,7 @@ export class PartnerService {
                 {
                     $set: {
                         password: await hashPassword(body.password)
-                    } 
+                    }
                 }
             );
             return result
@@ -180,7 +245,7 @@ export class PartnerService {
     async saveToPartner(id: string, emails: string[]): Promise<any | undefined> {
         try {
 
-            if (!emails.length){
+            if (!emails.length) {
                 return
             }
             const collections = await database_connection(["PRjunction"])
@@ -194,7 +259,7 @@ export class PartnerService {
                     quoteId: id
                 }
             })
-    
+
 
             const result = PRjunctionCollection.insertMany(tempObjs);
 
@@ -249,7 +314,7 @@ export class PartnerService {
             const reqIds = res.map((elem: any) => new ObjectId(elem?.quoteId))
             const newFromDate = new Date(fromDate)
             const newToDate = new Date(toDate)
-            const query : any = {
+            const query: any = {
                 "_id": { "$in": reqIds },
             }
             if (searchQuery) {
@@ -259,7 +324,7 @@ export class PartnerService {
                 query["requestTime"] = { "$gte": newFromDate, "$lte": newToDate }
             }
             const quotes = await requestCollection.find(query).skip(parseInt(pageNo) * 10).limit(10).toArray();
-            return {quotes:quotes,total: reqIds.length}
+            return { quotes: quotes, total: reqIds.length }
 
 
         } catch (e) {
@@ -267,5 +332,55 @@ export class PartnerService {
             throw new InternalServerErrorException()
         }
     }
+
+
+
+    async getAllPartners(setNo: string, searchQuery: string, isVerified: string): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["Partner"])
+            if (!collections) {
+                return
+            }
+            const partnerCollection = collections[0]
+            const query: any = {}
+            if (searchQuery) {
+                query["companyName"] = { "$regex": searchQuery, "$options": "i" }
+
+            }
+            if (isVerified === "true") {
+                query["isVerified"] = true
+            } else if (isVerified === "false") {
+                query["isVerified"] = false
+            }
+            console.log(query)
+            const [partners, total] = await Promise.all([partnerCollection.find(query).skip((parseInt(setNo) - 1) * 10).limit(10).toArray(), partnerCollection.countDocuments({})])
+
+
+
+            return { partners, total }
+
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
