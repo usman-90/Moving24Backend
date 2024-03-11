@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { isPointInPolygon, isPointWithinRadius } from 'geolib';
+import { ObjectId } from 'mongodb';
 import { database_connection } from 'src/db';
 import { RegionsService } from 'src/regions/regions.service';
 
@@ -27,6 +28,31 @@ export class QuotesService {
             throw new InternalServerErrorException()
         }
     }
+
+
+    async getOnePartnerById(id: string) {
+        try {
+
+
+            const collections = await database_connection(["Request"])
+            if (!collections) {
+                throw new InternalServerErrorException()
+            }
+            const requestCollection = collections[0]
+
+            const result = await requestCollection.findOne({_id: new ObjectId(id)})
+
+
+            return result
+
+        } catch (e) {
+
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
 
     async getRequestByEmail(email: string, setNo: number) {
         try {
@@ -62,6 +88,8 @@ export class QuotesService {
 
 
     arePointsInsideAnyPolygon(fromLat: number, fromLng: number, toLat: number, toLng: number, polygons: any) {
+        let isPoint1Inside = false
+        let isPoint2Inside = false
         for (const polygon of polygons) {
             const coordinates = polygon.map((coord: any) => { return { latitude: coord.lat, longitude: coord.lng } });
             let point1 = {
@@ -72,7 +100,13 @@ export class QuotesService {
                 latitude: toLat,
                 longitude: toLng
             }
-            if (isPointInPolygon(point1, coordinates) && isPointInPolygon(point2, coordinates)) {
+            if (isPointInPolygon(point1, coordinates)){
+                isPoint1Inside = true
+            }
+            if (isPointInPolygon(point2, coordinates)){
+                isPoint2Inside = true
+            }
+            if (isPoint1Inside && isPoint2Inside) {
                 return true;
             }
         }
@@ -93,12 +127,16 @@ export class QuotesService {
             const partners = await partnerCollection.find({}).toArray()
 
             let emails: any[] = []
-
+            console.log(fromLat,fromLng,toLat, toLng,"LATTTTTTTTTTTTT")
             await Promise.all(partners.map(async (partner: any) => {
                 if (partner?.areaPreference === "region") {
                     const regions = partner.regions.map((reg: any) => reg.name)
+                    console.log(regions,partner.email)
                     const regionPolygons = await this.regionService.getPolygon(regions)
                     regionPolygons.forEach((polygon: any) => {
+
+                        console.log(this.arePointsInsideAnyPolygon(fromLat, fromLng, toLat, toLng, polygon.multiPolygon))
+                        console.log(fromLat, fromLng, toLat, toLng,polygon.name, polygon.multiPolygon)
                         if (this.arePointsInsideAnyPolygon(fromLat, fromLng, toLat, toLng, polygon.multiPolygon)) {
                             emails.push(partner.email)
                         }

@@ -180,6 +180,9 @@ export class PartnerService {
     async saveToPartner(id: string, emails: string[]): Promise<any | undefined> {
         try {
 
+            if (!emails.length){
+                return
+            }
             const collections = await database_connection(["PRjunction"])
             if (!collections) {
                 return
@@ -191,6 +194,8 @@ export class PartnerService {
                     quoteId: id
                 }
             })
+    
+
             const result = PRjunctionCollection.insertMany(tempObjs);
 
             return result
