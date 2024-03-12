@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MailerService } from 'src/mailer/mailer.service';
 import { PartnerService } from 'src/partner/partner.service';
 import { ValidateSignUpData } from 'src/middlewares/ValidatePartnerSignUp.middleware';
+import { AdminService } from 'src/admin/admin.service';
 
 @Module({
     imports: [UsersModule,
@@ -17,7 +18,7 @@ import { ValidateSignUpData } from 'src/middlewares/ValidatePartnerSignUp.middle
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, MailerService, PartnerService]
+    providers: [AuthService, MailerService, PartnerService, AdminService]
 })
 export class AuthModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

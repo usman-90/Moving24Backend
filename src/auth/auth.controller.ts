@@ -19,6 +19,25 @@ export class AuthController {
         return this.authService.partnerSignUp(signInDto);
     }
 
+
+    @HttpCode(HttpStatus.OK)
+    @Post('adminLogin')
+    adminSignIn(@Body() signInDto: Record<string, any>) {
+        return this.authService.adminSignIn(signInDto.password, signInDto.email);
+    }
+
+
+
+    @HttpCode(HttpStatus.OK)
+    @Post('adminSignUp')
+    adminSignUp(@Body() signInDto: Record<string, any>) {
+        return this.authService.adminSignUp(signInDto);
+    }
+
+
+
+
+
     @HttpCode(HttpStatus.OK)
     @Post('sendVerificationCode')
     customerSignUp(@Body() signInDto: Record<string, any>) {

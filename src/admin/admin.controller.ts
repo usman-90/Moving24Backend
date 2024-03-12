@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -24,7 +24,7 @@ export class AdminController {
             requestTime:1,
             availablePartners:1
         }
-        const res = await this.quoteService.getAllRequest(req?.query?.setNo,projectObj)
+        const res = await this.quoteService.getAllRequest(req?.query?.setNo,projectObj, req?.query?.searchQuery)
         return res
     }
 
@@ -47,5 +47,60 @@ export class AdminController {
         const res = await this.partnerService.verifyDocument(body?.id, body?.key )
         return res
     }
+
+
+
+
+    @HttpCode(HttpStatus.OK)
+    @Get("getOnePartner")
+    async getOnePartnerById(@Query() query: Record<string, any>) {
+        console.log(query)
+        let projectionObj = {
+            _id: 1,
+            email: 1,
+            removalType: 1,
+            areaPreference: 1,
+            companyName: 1,
+            businessType: 1,
+            noOfEmployees: 1,
+            telephone: 1,
+            addressLine1: 1,
+            city: 1,
+            state: 1,
+            salutation: 1,
+            firstName: 1,
+            lastName: 1,
+            userName: 1,
+            location: 1,
+            radius: 1,
+            EIN:1,
+            regions:1,
+            profileImage:1,
+        };
+        const res = await this.partnerService.getPartnerById(query?.id, projectionObj)
+        return res
+    }
+
+
+
+    @HttpCode(HttpStatus.OK)
+    @Get("getOneQuotation")
+    async getOneQuotation(@Query() query: Record<string, any>) {
+        console.log(query)
+        const res = await this.quoteService.getOnePartnerById(query?.id)
+        return res
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

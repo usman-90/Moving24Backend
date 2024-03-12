@@ -52,7 +52,7 @@ export class QuotesService {
         }
     }
 
-    async getAllRequest(setNo: number, projectObj: any) {
+    async getAllRequest(setNo: number, projectObj: any, searchQuery: string) {
         try {
 
             let limit = 10
@@ -67,7 +67,16 @@ export class QuotesService {
 
             const [result, totalCount] = await Promise.all([
                 requestCollection.aggregate([
-                    { $match: {} },
+                    {
+                        $match: {
+                            $or: [
+                                { name : { $regex: searchQuery} },
+                                { moveFrom: { $regex: searchQuery } },
+                                { moveTo: { $regex: searchQuery } },
+                                { email: { $regex: searchQuery } }
+                            ]
+                        }
+                    },
                     { $project: projectObj },
                     { $sort: { requestTime: -1 } },
                     { $skip: skip },
@@ -224,23 +233,6 @@ export class QuotesService {
             throw new InternalServerErrorException()
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
