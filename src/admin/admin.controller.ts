@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -92,6 +92,28 @@ export class AdminController {
     }
 
 
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(["admin"])
+    @HttpCode(HttpStatus.OK)
+    @Put("updatePartnerDetails")
+    async updateNameAddr(@Body() body: Record<string, any>, @Req() req: any) {
+        const res = await this.adminService.updateAdminDetails(req.user._id, body)
+        return res
+    }
+
+
+
+
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(["admin"])
+    @HttpCode(HttpStatus.OK)
+    @Put("updatepartnerpassword")
+    async updatePartnerPassword(@Body() body: Record<string, any>, @Req() req: any) {
+        const res = await this.adminService.updateAdminPassword(req.user._id, body)
+        return res
+    }
 
 
 

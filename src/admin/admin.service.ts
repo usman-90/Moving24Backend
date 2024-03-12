@@ -53,4 +53,53 @@ export class AdminService {
 
 
 
+    async updateAdminDetails(id: string, body: any): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["Admin"])
+            if (!collections) {
+                return
+            }
+            const partnerCollection = collections[0]
+            const result = partnerCollection.updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $set: body
+                }
+            );
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+    async updateAdminPassword(id: string, body: any): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["Admin"])
+            if (!collections) {
+                return
+            }
+            console.log(body)
+            const partnerCollection = collections[0]
+            const result = partnerCollection.updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $set: {
+                        password: await hashPassword(body.password)
+                    }
+                }
+            );
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+
 }

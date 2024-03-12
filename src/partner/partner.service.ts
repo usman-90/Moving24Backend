@@ -169,8 +169,24 @@ export class PartnerService {
 
 
 
+    async getManyPartnerByEmail(emails: string[], projectionObj: any = {}): Promise<any | undefined> {
+        try {
 
-
+            const collections = await database_connection(["Partner"])
+            if (!collections) {
+                return
+            }
+            const partnerCollection = collections[0]
+            console.log(projectionObj)
+            const result = partnerCollection.find({
+                email: { $in: emails }
+            }, projectionObj).toArray()
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
 
 
     async getPartnerByEmail(email: string, projectionObj: any = {}): Promise<any | undefined> {

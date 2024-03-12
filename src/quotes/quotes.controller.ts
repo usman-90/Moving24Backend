@@ -23,7 +23,7 @@ export class QuotesController {
 
             const emails = await this.quoteService.getPartnerEmails(fromLatLng?.lat, fromLatLng?.lng, toLatLng?.lat, toLatLng?.lng)
             await this.quoteService.updateRequest(body.id, {
-                availablePartners: emails?.length
+                availablePartners: emails
             })
             if (!emails.length) {
                 return {

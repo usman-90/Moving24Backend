@@ -29,6 +29,40 @@ export class PartnerController {
     }
 
 
+    @HttpCode(HttpStatus.OK)
+    @Post("getManyPartnersByEmail")
+    async getManyPartners(@Body() body: Record<string, any>, @Req() req: any) {
+        let projectionObj = {
+            _id: 1,
+            email: 1,
+            removalType: 1,
+            areaPreference: 1,
+            companyName: 1,
+            businessType: 1,
+            noOfEmployees: 1,
+            telephone: 1,
+            addressLine1: 1,
+            city: 1,
+            state: 1,
+            salutation: 1,
+            firstName: 1,
+            lastName: 1,
+            userName: 1,
+            location: 1,
+            radius: 1,
+            about:1,
+            ans1:1,
+            ans2:1,
+            ans3:1,
+            EIN:1,
+            images:1,
+            regions:1,
+            profileImage:1,
+        };
+        console.log(body)
+        const res = await this.partnerService.getManyPartnerByEmail(body?.emails,projectionObj)
+        return res
+    }
 
 
 
