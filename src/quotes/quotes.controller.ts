@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, InternalServerErrorException, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, InternalServerErrorException, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { readFileSync } from 'fs';
 const ejs = require("ejs")
 import { QuotesService } from './quotes.service';
@@ -6,6 +6,8 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { MailerService } from 'src/mailer/mailer.service';
 import { RegionsService } from 'src/regions/regions.service';
 import { PartnerService } from 'src/partner/partner.service';
+
+
 @Controller('quotes')
 export class QuotesController {
     constructor(private quoteService: QuotesService, private mailService: MailerService, private regionService: RegionsService, private partnerService: PartnerService) { }
@@ -235,5 +237,30 @@ export class QuotesController {
             throw new InternalServerErrorException()
         }
     }
+
+
+
+
+
+
+
+
+
+
+    @HttpCode(HttpStatus.OK)
+    @Get("getRecent5quotes")
+    async getAllRecentPartnerReqs(@Query() query: Record<string, any>) {
+        const res = await this.quoteService.getRecent5Requests()
+        return res
+    }
+
+
+
+
+
+
+
+
+
 
 }

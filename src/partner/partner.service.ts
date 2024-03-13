@@ -288,7 +288,6 @@ export class PartnerService {
         }
     }
 
-
     async get5PartnerQuotes(email: string): Promise<any | undefined> {
         try {
 

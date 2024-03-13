@@ -102,7 +102,7 @@ export class PartnerController {
     @HttpCode(HttpStatus.OK)
     @Get("getOnePartner")
     async getOnePartnerById(@Query() query: Record<string, any>) {
-        console.log(query)
+        console.log(query,"hereeeeeeeee")
         let projectionObj = {
             _id: 1,
             email: 1,
@@ -129,6 +129,7 @@ export class PartnerController {
             images:1,
             regions:1,
             profileImage:1,
+            isVerified:1
         };
         const res = await this.partnerService.getPartnerById(query?.id, projectionObj)
         return res

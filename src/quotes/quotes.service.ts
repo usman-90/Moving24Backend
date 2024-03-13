@@ -9,6 +9,34 @@ export class QuotesService {
 
     constructor(private regionService: RegionsService) { }
 
+
+
+    async getRecent5Requests(): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection([ "Request"])
+            if (!collections) {
+                return
+            }
+            const requestCollection = collections[0]
+            const quotes = requestCollection
+                .find({})
+                .limit(5)
+                .sort({ requestTime : -1 })
+                .toArray()
+
+            return quotes
+
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+
     async postRequest(data: any) {
         try {
 
