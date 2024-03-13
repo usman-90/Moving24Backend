@@ -250,7 +250,7 @@ export class QuotesController {
     @HttpCode(HttpStatus.OK)
     @Get("getRecent5quotes")
     async getAllRecentPartnerReqs(@Query() query: Record<string, any>) {
-        const res = await this.quoteService.getRecent5Requests()
+        const res = await this.quoteService.getRecent5Requests(query)
         return res
     }
 

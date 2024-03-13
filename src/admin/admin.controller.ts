@@ -103,6 +103,15 @@ export class AdminController {
     }
 
 
+    @HttpCode(HttpStatus.OK)
+    @Get("getAdminDetails")
+    async getAdminDetails(@Body() body: Record<string, any>, @Req() req: any) {
+        const projectionObj  = {
+            password:0
+        }
+        const res = await this.adminService.getAdminDetails(req.query.id,projectionObj)
+        return res
+    }
 
 
 

@@ -338,7 +338,7 @@ export class PartnerService {
             if (!isNaN(newFromDate.getTime()) && !isNaN(newToDate.getTime())) {
                 query["requestTime"] = { "$gte": newFromDate, "$lte": newToDate }
             }
-            const quotes = await requestCollection.find(query).skip(parseInt(pageNo) * 10).limit(10).toArray();
+            const quotes = await requestCollection.find(query).skip(parseInt(pageNo) * 10).sort({requestTime : -1}).limit(10).toArray();
             return { quotes: quotes, total: reqIds.length }
 
 

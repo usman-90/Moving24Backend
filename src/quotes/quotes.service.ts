@@ -11,9 +11,13 @@ export class QuotesService {
 
 
 
-    async getRecent5Requests(): Promise<any | undefined> {
+    async getRecent5Requests(query: any): Promise<any | undefined> {
         try {
-
+            let sortObj : any = {requestTime : -1}
+            if (query?.maxBudget === "true"){
+                sortObj.maxBudgetRange = 1
+            }
+            console.log(sortObj, query?.maxBudget)
             const collections = await database_connection([ "Request"])
             if (!collections) {
                 return
@@ -22,7 +26,7 @@ export class QuotesService {
             const quotes = requestCollection
                 .find({})
                 .limit(5)
-                .sort({ requestTime : -1 })
+                .sort(sortObj)
                 .toArray()
 
             return quotes
