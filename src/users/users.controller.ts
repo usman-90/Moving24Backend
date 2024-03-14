@@ -1,9 +1,9 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { QuotesService } from 'src/quotes/quotes.service';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { AdminService } from 'src/admin/admin.service';
+import { QuotesService } from '../quotes/quotes.service';
+import { AuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { AdminService } from '../admin/admin.service';
 
 @Controller('users')
 export class UsersController {

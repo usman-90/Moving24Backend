@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
-import { database_connection } from 'src/db';
-import { hashPassword } from 'src/utils/hashPassword';
+import { database_connection } from '../db';
+import { hashPassword } from '../utils/hashPassword';
 
 @Injectable()
 export class PartnerService {

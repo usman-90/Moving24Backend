@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { PartnerService } from 'src/partner/partner.service';
+import { PartnerService } from '../partner/partner.service';
 
 @Injectable()
 export class CheckPartnerEmailMiddleware implements NestMiddleware {

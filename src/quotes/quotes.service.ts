@@ -1,8 +1,8 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { isPointInPolygon, isPointWithinRadius } from 'geolib';
 import { ObjectId } from 'mongodb';
-import { database_connection } from 'src/db';
-import { RegionsService } from 'src/regions/regions.service';
+import { database_connection } from '../db';
+import { RegionsService } from '../regions/regions.service';
 
 @Injectable()
 export class QuotesService {

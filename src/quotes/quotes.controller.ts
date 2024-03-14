@@ -3,9 +3,9 @@ import { readFileSync } from 'fs';
 const ejs = require("ejs")
 import { QuotesService } from './quotes.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { MailerService } from 'src/mailer/mailer.service';
-import { RegionsService } from 'src/regions/regions.service';
-import { PartnerService } from 'src/partner/partner.service';
+import { MailerService } from '../mailer/mailer.service';
+import { RegionsService } from '../regions/regions.service';
+import { PartnerService } from '../partner/partner.service';
 
 
 @Controller('quotes')

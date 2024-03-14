@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { database_connection } from 'src/db';
+import { database_connection } from '../db';
 const NodeGeocoder = require('node-geocoder');
 
 @Injectable()
