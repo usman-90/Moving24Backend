@@ -1,7 +1,7 @@
 import { GoneException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { database_connection } from '../db';
-import { hashPassword } from 'src/utils/hashPassword';
+import { hashPassword } from '../utils/hashPassword';
 
 export type User = {
     _id: string | ObjectId,
