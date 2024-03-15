@@ -11,7 +11,7 @@ export class RegionsService {
 
             const options = {
                 provider: 'google',
-                apiKey: 'AIzaSyBmlfCX9N5NAKdGidMbSxMXkc4CNHcT6rQ', 
+                apiKey: process.env.GOOGLE_API_KEY,
             };
 
             const geocoder = NodeGeocoder(options);

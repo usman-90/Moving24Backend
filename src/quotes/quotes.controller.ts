@@ -256,6 +256,12 @@ export class QuotesController {
 
 
 
+    @HttpCode(HttpStatus.OK)
+    @Get("getMaxBudgetQuotes")
+    async getTop5MaxBudgetQuotes(@Query() query: Record<string, any>) {
+        const res = await this.quoteService.getMaxBudgetQuotes()
+        return res
+    }
 
 
 

@@ -268,4 +268,34 @@ export class QuotesService {
 
 
 
+
+
+
+
+
+    async getMaxBudgetQuotes(){
+        try {
+
+            const collections = await database_connection(["Request"])
+            if (!collections) {
+                throw new InternalServerErrorException()
+            }
+            const requestCollection = collections[0]
+            const quotes = requestCollection
+                .find({})
+                .sort({ maxBudgetRange: -1 })
+                .limit(5)
+                .toArray()
+
+            return quotes
+    }catch(e){
+        console.log(e)
+        throw new InternalServerErrorException()
+    }
+
+
+}
+
+
+
 }
