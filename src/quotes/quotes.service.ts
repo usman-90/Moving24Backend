@@ -11,6 +11,69 @@ export class QuotesService {
 
 
 
+
+    async getQuotationPartners(id: string): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["Request", "Partner"])
+            if (!collections) {
+                return
+            }
+            const requestCollection = collections[0]
+            console.log(id)
+            const quotes = await requestCollection
+                .findOne({ _id: new ObjectId(id) }, { projection: { availablePartners: 1 } })
+
+
+            const partnerCollection = collections[1]
+
+            let projectionObj = {
+                _id: 1,
+                email: 1,
+                removalType: 1,
+                areaPreference: 1,
+                companyName: 1,
+                businessType: 1,
+                noOfEmployees: 1,
+                telephone: 1,
+                addressLine1: 1,
+                city: 1,
+                state: 1,
+                salutation: 1,
+                firstName: 1,
+                lastName: 1,
+                userName: 1,
+                location: 1,
+                radius: 1,
+                EIN: 1,
+                regions: 1,
+                profileImage: 1,
+            };
+            
+            if (!quotes?.availablePartners) {
+                return []
+            }
+
+            console.log(quotes)
+
+            const partners = partnerCollection
+                .find({ email: { $in: quotes?.availablePartners } }, { projection: projectionObj })
+                .toArray()
+
+            return partners
+
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+
+
+
+
     async getRecent5Requests(query: any): Promise<any | undefined> {
         try {
             let sortObj: any = { requestTime: -1 }
@@ -248,15 +311,15 @@ export class QuotesService {
                     }
                 }
             })
-        
+
             const partners = await partnerCollection.find({}).toArray()
 
             let emails: any[] = []
             await Promise.all(partners.map(async (partner: any) => {
                 if (partner?.areaPreference === "region") {
                     let push = true
-                     const partnerRegions = partner?.regions?.map((reg: any) => reg.name)
-                     requiredRegions.forEach((region: any) => {
+                    const partnerRegions = partner?.regions?.map((reg: any) => reg.name)
+                    requiredRegions.forEach((region: any) => {
                         if (!partnerRegions.includes(region)) {
                             push = false
                         }
@@ -290,7 +353,7 @@ export class QuotesService {
 
                 }
             }))
-            
+
 
             return emails
 

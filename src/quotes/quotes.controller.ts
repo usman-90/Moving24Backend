@@ -277,6 +277,12 @@ export class QuotesController {
     }
 
 
+    @HttpCode(HttpStatus.OK)
+    @Post("getQuotationPartners")
+    async getQuotationPartners(@Req() req: any) {
+        const res = await this.quoteService.getQuotationPartners(req.body?.id)
+        return res
+    }
 
 
 
