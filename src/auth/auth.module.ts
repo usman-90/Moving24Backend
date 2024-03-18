@@ -1,14 +1,14 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { CheckEmailMiddleware } from 'src/middlewares/CheckEmailAvailablity.middleware';
-import { CheckPartnerEmailMiddleware } from 'src/middlewares/checkPartnerEmailAvailablity.middleware';
+import { CheckEmailMiddleware } from '../middlewares/CheckEmailAvailablity.middleware';
+import { CheckPartnerEmailMiddleware } from '../middlewares/checkPartnerEmailAvailablity.middleware';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
-import { MailerService } from 'src/mailer/mailer.service';
+import { MailerService } from '../mailer/mailer.service';
 import { PartnerService } from 'src/partner/partner.service';
-import { ValidateSignUpData } from 'src/middlewares/ValidatePartnerSignUp.middleware';
-import { AdminService } from 'src/admin/admin.service';
+import { ValidateSignUpData } from '../middlewares/ValidatePartnerSignUp.middleware';
+import { AdminService } from '../admin/admin.service';
 
 @Module({
     imports: [UsersModule,

@@ -1,8 +1,8 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { isPointInPolygon, isPointWithinRadius } from 'geolib';
 import { ObjectId } from 'mongodb';
-import { database_connection } from 'src/db';
-import { RegionsService } from 'src/regions/regions.service';
+import { database_connection } from '../db';
+import { RegionsService } from '../regions/regions.service';
 
 @Injectable()
 export class QuotesService {
@@ -11,14 +11,77 @@ export class QuotesService {
 
 
 
+
+    async getQuotationPartners(id: string): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["Request", "Partner"])
+            if (!collections) {
+                return
+            }
+            const requestCollection = collections[0]
+            console.log(id)
+            const quotes = await requestCollection
+                .findOne({ _id: new ObjectId(id) }, { projection: { availablePartners: 1 } })
+
+
+            const partnerCollection = collections[1]
+
+            let projectionObj = {
+                _id: 1,
+                email: 1,
+                removalType: 1,
+                areaPreference: 1,
+                companyName: 1,
+                businessType: 1,
+                noOfEmployees: 1,
+                telephone: 1,
+                addressLine1: 1,
+                city: 1,
+                state: 1,
+                salutation: 1,
+                firstName: 1,
+                lastName: 1,
+                userName: 1,
+                location: 1,
+                radius: 1,
+                EIN: 1,
+                regions: 1,
+                profileImage: 1,
+            };
+            
+            if (!quotes?.availablePartners) {
+                return []
+            }
+
+            console.log(quotes)
+
+            const partners = partnerCollection
+                .find({ email: { $in: quotes?.availablePartners } }, { projection: projectionObj })
+                .toArray()
+
+            return partners
+
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+
+
+
+
     async getRecent5Requests(query: any): Promise<any | undefined> {
         try {
-            let sortObj : any = {requestTime : -1}
-            if (query?.maxBudget === "true"){
+            let sortObj: any = { requestTime: -1 }
+            if (query?.maxBudget === "true") {
                 sortObj.maxBudgetRange = 1
             }
             console.log(sortObj, query?.maxBudget)
-            const collections = await database_connection([ "Request"])
+            const collections = await database_connection(["Request"])
             if (!collections) {
                 return
             }
@@ -102,7 +165,7 @@ export class QuotesService {
                     {
                         $match: {
                             $or: [
-                                { name : { $regex: searchQuery} },
+                                { name: { $regex: searchQuery } },
                                 { moveFrom: { $regex: searchQuery } },
                                 { moveTo: { $regex: searchQuery } },
                                 { email: { $regex: searchQuery } }
@@ -182,19 +245,11 @@ export class QuotesService {
     }
 
 
-    arePointsInsideAnyPolygon(fromLat: number, fromLng: number, toLat: number, toLng: number, polygons: any) {
+    arePointsInsideAnyPolygon(point1: any, point2: any, polygons: any[]) {
         let isPoint1Inside = false
         let isPoint2Inside = false
         for (const polygon of polygons) {
             const coordinates = polygon.map((coord: any) => { return { latitude: coord.lat, longitude: coord.lng } });
-            let point1 = {
-                latitude: fromLat,
-                longitude: fromLng
-            }
-            let point2 = {
-                latitude: toLat,
-                longitude: toLng
-            }
             if (isPointInPolygon(point1, coordinates)) {
                 isPoint1Inside = true
             }
@@ -202,10 +257,16 @@ export class QuotesService {
                 isPoint2Inside = true
             }
             if (isPoint1Inside && isPoint2Inside) {
-                return true;
+                return {
+                    isPoint1Inside,
+                    isPoint2Inside
+                };
             }
         }
-        return false;
+        return {
+            isPoint1Inside,
+            isPoint2Inside
+        };
     }
 
 
@@ -219,25 +280,59 @@ export class QuotesService {
             }
             const partnerCollection = collections[0]
 
+
+            const requiredRegions: any = []
+            let point1 = {
+                latitude: fromLat,
+                longitude: fromLng,
+            }
+            let point2 = {
+                latitude: toLat,
+                longitude: toLng
+            }
+            let isPoint1Inside = false
+            let isPoint2Inside = false
+
+            const regions = ["Ajman", "Dubai", "Fujairah", "RasAl-Khaimah", "Sharjah", "Ummal-Qaywayn", "AbuDhabi"]
+            const polygons = await this.regionService.getPolygon(regions)
+
+            polygons.forEach((polygon: any) => {
+                if ((!isPoint1Inside || !isPoint2Inside)) {
+                    const result = this.arePointsInsideAnyPolygon(point1, point2, polygon.multiPolygon)
+
+                    if (result.isPoint1Inside || result.isPoint2Inside) {
+                        requiredRegions.push(polygon.name)
+                    }
+                    if (result.isPoint1Inside) {
+                        isPoint1Inside = true
+                    }
+                    if (result.isPoint2Inside) {
+                        isPoint2Inside = true
+                    }
+                }
+            })
+
             const partners = await partnerCollection.find({}).toArray()
 
             let emails: any[] = []
-            console.log(fromLat, fromLng, toLat, toLng, "LATTTTTTTTTTTTT")
             await Promise.all(partners.map(async (partner: any) => {
                 if (partner?.areaPreference === "region") {
-                    const regions = partner.regions.map((reg: any) => reg.name)
-                    console.log(regions, partner.email)
-                    const regionPolygons = await this.regionService.getPolygon(regions)
-                    regionPolygons.forEach((polygon: any) => {
-
-                        console.log(this.arePointsInsideAnyPolygon(fromLat, fromLng, toLat, toLng, polygon.multiPolygon))
-                        console.log(fromLat, fromLng, toLat, toLng, polygon.name, polygon.multiPolygon)
-                        if (this.arePointsInsideAnyPolygon(fromLat, fromLng, toLat, toLng, polygon.multiPolygon)) {
-                            emails.push(partner.email)
+                    let push = true
+                    const partnerRegions = partner?.regions?.map((reg: any) => reg.name)
+                    requiredRegions.forEach((region: any) => {
+                        if (!partnerRegions.includes(region)) {
+                            push = false
                         }
                     })
+                    if (push) {
+                        emails.push({
+                            email: partner.email,
+                            companyName: partner.companyName
+                        })
+                    }
 
                 } else if (partner.areaPreference === "radius") {
+
                     const latLng = await this.regionService.getLatLng(partner.location)
                     const isPointOneInRadius = isPointWithinRadius(
                         { latitude: fromLat, longitude: fromLng },
@@ -249,13 +344,16 @@ export class QuotesService {
                         { latitude: latLng?.lat, longitude: latLng?.lng },
                         partner.radius * 1609.34
                     );
-                    console.log(isPointWithinRadius, isPointTwoInRadius, "isInRadius")
                     if (isPointTwoInRadius && isPointOneInRadius) {
-                        emails.push(partner.email)
+                        emails.push({
+                            email: partner.email,
+                            companyName: partner.companyName
+                        })
                     }
 
                 }
             }))
+
 
             return emails
 
@@ -264,6 +362,36 @@ export class QuotesService {
             console.log(e)
             throw new InternalServerErrorException()
         }
+    }
+
+
+
+
+
+
+
+
+    async getMaxBudgetQuotes() {
+        try {
+
+            const collections = await database_connection(["Request"])
+            if (!collections) {
+                throw new InternalServerErrorException()
+            }
+            const requestCollection = collections[0]
+            const quotes = requestCollection
+                .find({})
+                .sort({ maxBudgetRange: -1 })
+                .limit(5)
+                .toArray()
+
+            return quotes
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+
+
     }
 
 

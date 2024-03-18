@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { database_connection } from 'src/db';
+import { database_connection } from '../db';
 const NodeGeocoder = require('node-geocoder');
 
 @Injectable()
@@ -11,7 +11,7 @@ export class RegionsService {
 
             const options = {
                 provider: 'google',
-                apiKey: 'AIzaSyBmlfCX9N5NAKdGidMbSxMXkc4CNHcT6rQ', 
+                apiKey: process.env.GOOGLE_API_KEY,
             };
 
             const geocoder = NodeGeocoder(options);

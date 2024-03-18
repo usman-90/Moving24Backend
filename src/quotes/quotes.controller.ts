@@ -3,9 +3,9 @@ import { readFileSync } from 'fs';
 const ejs = require("ejs")
 import { QuotesService } from './quotes.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { MailerService } from 'src/mailer/mailer.service';
-import { RegionsService } from 'src/regions/regions.service';
-import { PartnerService } from 'src/partner/partner.service';
+import { MailerService } from '../mailer/mailer.service';
+import { RegionsService } from '../regions/regions.service';
+import { PartnerService } from '../partner/partner.service';
 
 
 @Controller('quotes')
@@ -23,21 +23,23 @@ export class QuotesController {
             const fromLatLng = await this.regionService.getLatLng(body.moveFrom)
             const toLatLng = await this.regionService.getLatLng(body.moveTo)
 
-            const emails = await this.quoteService.getPartnerEmails(fromLatLng?.lat, fromLatLng?.lng, toLatLng?.lat, toLatLng?.lng)
+            const partnersToSend = await this.quoteService.getPartnerEmails(fromLatLng?.lat, fromLatLng?.lng, toLatLng?.lat, toLatLng?.lng)
+            const emails = partnersToSend?.map((elem: any) => elem?.email)
+
             await this.quoteService.updateRequest(body.id, {
                 availablePartners: emails
             })
-            if (!emails.length) {
+            if (!emails?.length) {
                 return {
                     message: "No partners available"
                 }
             }
-            console.log(emails, "emails to send")
+            console.log(emails,"Emails")
             const requestDetails = await this.quoteService.getOnePartnerById(body.id)
             await this.partnerService.saveToPartner(body.id, emails)
-            console.log(emails,"emailss")
-            if (emails?.length) {
-                emails?.forEach(async (email: string) => {
+
+            if (partnersToSend?.length) {
+                partnersToSend?.forEach(async (email: any) => {
                     await this.mailService.sendMain({
                         subject: "Moving 24 New Request",
                         html: ejs.render(`
@@ -75,7 +77,7 @@ export class QuotesController {
 </head>
 <body>
     <div class="container">
-    <h1>Hi</h1>
+    <h1>Hi ${email?.companyName ?? ""},</h1>
     <h3>We are pleased to inform you that a new quotation request has been received for your area. The details are as follows:</h3>
         <div class="field">
             <label>Move From:</label>
@@ -176,11 +178,11 @@ export class QuotesController {
             <span>${requestDetails?.wappNum ?? " "}</span>
         </div>
         <div class="field">
-            <label>Minimum Budget Range:</label>
+            <label>Minimum Budget :</label>
             <span>${requestDetails?.minBudgetRange ?? " "}</span>
         </div>
         <div class="field">
-            <label>Maximum Budget Range:</label>
+            <label>Maximum Budget :</label>
             <span>${requestDetails?.maxBudgetRange ?? " "}</span>
         </div>
         <div class="field">
@@ -216,22 +218,33 @@ export class QuotesController {
 `
                             )}</span>
         </div>
-        <h3>
-            This reques has also been sent to ${emails?.length - 1} other partners, their emails are ${emails?.join(" , ")}
-        </h3>
+        ${partnersToSend?.length - 1 > 0 ? (
+                                `<h3>
+            This reques has also been sent to ${partnersToSend?.length - 1} other Companies, their Names are ${partnersToSend?.filter((elem) => elem?.email !== email?.email).map((elem) => elem?.companyName)?.join(" , ")}
+        </h3>`
+                            ) : (
+                                `<h3>
+        This request is only sent to you! 
+        </h3>`
+                            )
+                            }
     </div>
 </body>
 </html>
 
                                          `
                         ),
-                        to: email,
+                        to: email?.email,
                         from: process.env.EMAIL
                     })
 
                 })
 
             }
+
+
+
+
             return emails
         } catch (e) {
             console.log(e)
@@ -257,8 +270,20 @@ export class QuotesController {
 
 
 
+    @HttpCode(HttpStatus.OK)
+    @Get("getMaxBudgetQuotes")
+    async getTop5MaxBudgetQuotes(@Query() query: Record<string, any>) {
+        const res = await this.quoteService.getMaxBudgetQuotes()
+        return res
+    }
 
 
+    @HttpCode(HttpStatus.OK)
+    @Post("getQuotationPartners")
+    async getQuotationPartners(@Req() req: any) {
+        const res = await this.quoteService.getQuotationPartners(req.body?.id)
+        return res
+    }
 
 
 

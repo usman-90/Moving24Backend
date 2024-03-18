@@ -1,10 +1,10 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { Roles } from 'src/auth/roles.decorator';
-import { QuotesService } from 'src/quotes/quotes.service';
-import { PartnerService } from 'src/partner/partner.service';
+import { RolesGuard } from '../auth/roles.guard';
+import { AuthGuard } from '../auth/auth.guard';
+import { Roles } from '../auth/roles.decorator';
+import { QuotesService } from '../quotes/quotes.service';
+import { PartnerService } from '../partner/partner.service';
 
 @Controller('admin')
 export class AdminController {

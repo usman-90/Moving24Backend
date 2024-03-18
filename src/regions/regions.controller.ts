@@ -23,5 +23,12 @@ export class RegionsController {
 
 
 
+    @HttpCode(HttpStatus.OK)
+    @Get("getAllPolygons")
+    async getAllPolygons(@Query() query: any) {
+        const regions = ["Ajman", "Dubai", "Fujairah", "RasAl-Khaimah", "Sharjah", "Ummal-Qaywayn", "AbuDhabi"]
+        return this.regionService.getPolygon(regions)
+    }
+
 
 }
