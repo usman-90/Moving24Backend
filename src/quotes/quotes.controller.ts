@@ -151,7 +151,7 @@ export class QuotesController {
 
 
         <div class="field">
-            <label>New Property Additional Info:</label>
+            <label>Scope of work:</label>
             <ul>
                 ${requestDetails?.newPropertyAdditionalInfo?.map((info: any) => {
                                 return (
