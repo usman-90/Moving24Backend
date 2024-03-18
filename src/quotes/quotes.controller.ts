@@ -35,8 +35,9 @@ export class QuotesController {
             console.log(emails, "emails to send")
             const requestDetails = await this.quoteService.getOnePartnerById(body.id)
             await this.partnerService.saveToPartner(body.id, emails)
-            if (emails.length) {
-                emails.forEach(async (email: string) => {
+            console.log(emails,"emailss")
+            if (emails?.length) {
+                emails?.forEach(async (email: string) => {
                     await this.mailService.sendMain({
                         subject: "Moving 24 New Request",
                         html: ejs.render(`

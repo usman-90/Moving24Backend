@@ -28,6 +28,7 @@ export class MailerService {
 
         const transporter = nodemailer.createTransport({
             service: "gmail",
+            secure:false,
             auth: {
                 type: "OAuth2",
                 user: process.env.EMAIL,
