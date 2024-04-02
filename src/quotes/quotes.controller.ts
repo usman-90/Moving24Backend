@@ -88,7 +88,7 @@ export class QuotesController {
             <span>${requestDetails?.moveTo ?? " "}</span>
         </div>
         <div class="field">
-            <label>New Property Type:</label>
+            <label>Current Property Type:</label>
             <span>${requestDetails?.currPropertyType ?? " "}</span>
         </div>
         <div class="field">
@@ -102,11 +102,11 @@ export class QuotesController {
                             ) : (
                                 `
         <div class="field">
-            <label>No of Bedrooms:</label>
+            <label>Current Property Floor number:</label>
             <span>${requestDetails?.currPropertyFloorNo ?? ""}</span>
         </div>
         <div class="field">
-            <label>No of Bedrooms:</label>
+            <label>Has current property lift:</label>
             <span>${requestDetails?.hasCurrPropertyLift ?? ""}</span>
         </div>
                                 `
@@ -123,17 +123,21 @@ export class QuotesController {
             <span>${requestDetails?.newPropertyType ?? " "}</span>
         </div>
         <div class="field">
+            <label>New Property Bedrooms:</label>
+            <span>${requestDetails?.newPropertyBedrooms ?? "None"}</span>
+        </div>
+        <div class="field">
                 ${requestDetails?.newPropertyType === "house" ? (
                                 `
 `
                             ) : (
                                 `
         <div class="field">
-            <label>No of Bedrooms:</label>
+            <label>New Property Floor Number:</label>
             <span>${requestDetails?.newPropertyFloorNo ?? ""}</span>
         </div>
         <div class="field">
-            <label>Scope of Work:</label>
+            <label>Has New Property lift:</label>
             <span>${requestDetails?.hasNewPropertyLift ?? ""}</span>
         </div>
                                 `
