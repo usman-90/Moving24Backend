@@ -21,6 +21,7 @@ export class UsersController {
             moveTo: body.moveTo,
             currPropertyType: body.currPropertyType,
             currPropertyBedrooms: body.currPropertyBedrooms,
+            newPropertyBedrooms: body.newPropertyBedrooms,
             newPropertyType: body.newPropertyType,
             newPropertyAdditionalInfo: body.newPropertyAdditionalInfo,
             movingDatePref: body.movingDatePref,
@@ -36,7 +37,7 @@ export class UsersController {
             temp.currPropertyFloorNo = body.currPropertyFloorNo,
                 temp.hasCurrPropertyLift = body.hasCurrPropertyLift
         }
-        if (body.currPropertyType === "appartment") {
+        if (body.newPropertyType === "appartment") {
             temp.newPropertyFloorNo = body.newPropertyFloorNo,
                 temp.hasNewPropertyLift = body.hasNewPropertyLift
         }
