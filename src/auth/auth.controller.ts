@@ -13,6 +13,8 @@ export class AuthController {
 
 
 
+
+
     @HttpCode(HttpStatus.OK)
     @Post('partnerSignUp')
     partnerSignUp(@Body() signInDto: Record<string, any>) {

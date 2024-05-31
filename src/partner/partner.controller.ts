@@ -28,6 +28,27 @@ export class PartnerController {
         return res
     }
 
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(["partner"])
+    @HttpCode(HttpStatus.OK)
+    @Get("getPartnerProofs")
+    async fetchPartnerProofs(@Body() body: Record<string, any>, @Req() req: any) {
+        const res = await this.partnerService.getPartnerProofsById(req.user._id)
+        console.log(res, "res")
+        return res
+    }
+
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(["partner"])
+    @HttpCode(HttpStatus.OK)
+    @Put("updatePartnerProofs")
+    async updatePartnerProofs(@Body() body: Record<string, any>, @Req() req: any) {
+        const res = await this.partnerService.updatePartnerProofs(req.user._id,body)
+        console.log(res, "res")
+        return res
+    }
+
 
     @HttpCode(HttpStatus.OK)
     @Post("getManyPartnersByEmail")
