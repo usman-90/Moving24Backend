@@ -51,7 +51,7 @@ export class AdminService {
         }
     }
 
-    async getAdminDetails(id: string, projectionObj : any): Promise<any | undefined> {
+    async getAdminDetails(id: string, projectionObj: any): Promise<any | undefined> {
         try {
 
             const collections = await database_connection(["Admin"])
@@ -61,7 +61,7 @@ export class AdminService {
             const partnerCollection = collections[0]
             const result = partnerCollection.findOne(
                 { _id: new ObjectId(id) },
-                { projection: projectionObj}
+                { projection: projectionObj }
 
             );
 
@@ -86,6 +86,54 @@ export class AdminService {
                 {
                     $set: body
                 }
+            );
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+    async getMinimumBudget(): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["WebsiteData"])
+            if (!collections) {
+                return
+            }
+            const websiteDataCollection = collections[0]
+            const result = websiteDataCollection.findOne(
+                { name: "minimumBudgetRange" },
+            );
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+
+    async updateMinimumBudget(minimumBudgetRange: string): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["WebsiteData"])
+            if (!collections) {
+                return
+            }
+            const websiteDataCollection = collections[0]
+            console.log(minimumBudgetRange)
+            const result = websiteDataCollection.updateOne(
+                { name: "minimumBudgetRange" },
+                {
+                    $set: {
+                        minimumBudgetRange: parseInt(minimumBudgetRange)
+                    }
+                },
+                { upsert: true }
             );
             return result
         } catch (e) {

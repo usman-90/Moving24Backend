@@ -38,6 +38,29 @@ export class AdminController {
         return res
     }
 
+
+
+    //    @UseGuards(AuthGuard, RolesGuard)
+//    @Roles(["admin"])
+    @HttpCode(HttpStatus.OK)
+    @Put("updateMinimumBudgetRange")
+    async updateMinimumBudgetRange( @Req() req: any, @Body() body: any) {
+        const res = await this.adminService.updateMinimumBudget(body?.minimumBudget)
+        return res
+    }
+
+
+    //    @UseGuards(AuthGuard, RolesGuard)
+//    @Roles(["admin"])
+    @HttpCode(HttpStatus.OK)
+    @Get("getMinimumBudgetRange")
+    async getMinimumBudgetRange() {
+        const res = await this.adminService.getMinimumBudget()
+        return res
+    }
+
+
+
     //    @UseGuards(AuthGuard, RolesGuard)
 //    @Roles(["admin"])
     @HttpCode(HttpStatus.OK)
