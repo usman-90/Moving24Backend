@@ -49,6 +49,15 @@ export class AdminController {
     }
 
 
+    //    @UseGuards(AuthGuard, RolesGuard)
+//    @Roles(["admin"])
+    @HttpCode(HttpStatus.OK)
+    @Get("getWeeklySales")
+    async getWeeklySales( ) {
+        const res = await this.quoteService.getWeeklyQuotes()
+        return res
+    }
+
 
 
     @HttpCode(HttpStatus.OK)
