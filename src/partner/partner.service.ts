@@ -27,6 +27,7 @@ export class PartnerService {
                 isVerified: false,
                 createdAt: new Date(),
                 profileImage: '',
+                lastRequestReceivedOn: null
             });
             return result;
         } catch (e) {
@@ -251,6 +252,67 @@ export class PartnerService {
         }
     }
 
+    async getPartnerProofsById(id: string): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["Partner"])
+
+            if (!collections) {
+                return
+            }
+            console.log(id)
+            const partnerCollection = collections[0]
+            const result = partnerCollection.findOne({
+                _id: new ObjectId(id),
+            }, {
+                proof: 1
+            })
+            console.log(result)
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+    async updatePartnerProofs(id: string, proofs: any): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["Partner"])
+            console.log(proofs)
+
+            if (!collections) {
+                return
+            }
+
+            console.log(id)
+            const partnerCollection = collections[0]
+
+            const res = await partnerCollection.findOne({
+                _id: new ObjectId(id),
+            }, {
+                proof: 1
+            })
+            const mongoQuery = {
+                $set: {
+                    proof: { ...res?.proof, ...proofs },
+                    isVerified: false
+                }
+            }
+            const result = await partnerCollection.updateOne(
+                { _id: new ObjectId(id) },
+                mongoQuery
+            );
+
+            return result
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
     async saveToPartner(id: string, emails: string[]): Promise<any | undefined> {
         try {
             if (!emails.length) {
@@ -270,6 +332,33 @@ export class PartnerService {
 
             const result = PRjunctionCollection.insertMany(tempObjs);
 
+            return result;
+        } catch (e) {
+            console.log(e);
+            throw new InternalServerErrorException();
+        }
+    }
+
+
+    async updateLastReceivedDate(email : string): Promise<any | undefined> {
+        try {
+            if (!email) {
+                return;
+            }
+            const collections = await database_connection(['Partner']);
+            if (!collections) {
+                return;
+            }
+            const PartnerCollection = collections[0];
+            const result = PartnerCollection.updateOne(
+                { email : email },
+                {
+                    $set: {
+                        lastRequestReceivedOn: new Date()
+                    },
+                },
+            );
+            console.log(result)
             return result;
         } catch (e) {
             console.log(e);
@@ -399,21 +488,21 @@ export class PartnerService {
                     },
                 },
                 { $unwind: '$documents' },
-                                {
-                                    $match: {
-                                        'documents.v.expirationDate': {
-                                            $gte: new Date(),
-                                            $lte: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-                                        },
-                                    },
-                                },
-                                {
-                                    $group: {
-                                        _id: '$_id',
-                                        email: { $first: '$email' },
-                                        documentNames: { $push: '$documents.v.name' },
-                                    },
-                                },
+                {
+                    $match: {
+                        'documents.v.expirationDate': {
+                            $gte: new Date(),
+                            $lte: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+                        },
+                    },
+                },
+                {
+                    $group: {
+                        _id: '$_id',
+                        email: { $first: '$email' },
+                        documentNames: { $push: '$documents.v.name' },
+                    },
+                },
             ]).toArray();
 
             partners.forEach((partner: any) => {

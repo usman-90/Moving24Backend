@@ -66,30 +66,77 @@ export class QuotesService {
     }
   }
 
-  async getRecent5Requests(query: any): Promise<any | undefined> {
-    try {
-      let sortObj: any = { requestTime: -1 };
-      if (query?.maxBudget === 'true') {
-        sortObj.maxBudgetRange = 1;
-      }
-      console.log(sortObj, query?.maxBudget);
-      const collections = await database_connection(['Request']);
-      if (!collections) {
-        return;
-      }
-      const requestCollection = collections[0];
-      const quotes = requestCollection
-        .find({})
-        .limit(5)
-        .sort(sortObj)
-        .toArray();
 
-      return quotes;
-    } catch (e) {
-      console.log(e);
-      throw new InternalServerErrorException();
+    async getWeeklyQuotes(): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["Request"])
+            if (!collections) {
+                return
+            }
+            const requestCollection = collections[0]
+            const quotes = requestCollection.aggregate([
+                {
+                    $match: {
+                        requestTime: {
+                            $gte: new Date(new Date().getTime() - (10 * 7 * 24 * 60 * 60 * 4000)) // 10 weeks ago
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            $dateToString: { format: "%Y-%U", date: "$requestTime" } // Grouping by year and week
+                        },
+//                        count: { $sum: 1 }, // Counting documents in each group
+                        maxBudgetRangeSum: { $sum: "$maxBudgetRange" } // Summing maxBudgetRange
+                    }
+                },
+                {
+                    $sort: { "_id": -1 } // Sorting by week, newest first
+                }
+            ]).toArray()
+                ;
+            return quotes
+
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
     }
-  }
+
+
+
+
+
+
+    async getRecent5Requests(query: any): Promise<any | undefined> {
+        try {
+            let sortObj: any = { requestTime: -1 }
+            if (query?.maxBudget === "true") {
+                sortObj.maxBudgetRange = 1
+            }
+            console.log(sortObj, query?.maxBudget)
+            const collections = await database_connection(["Request"])
+            if (!collections) {
+                return
+            }
+            const requestCollection = collections[0]
+            const quotes = requestCollection
+                .find({})
+                .limit(5)
+                .sort(sortObj)
+                .toArray()
+
+            return quotes
+
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+  
 
   async postRequest(data: any) {
     try {
@@ -252,6 +299,7 @@ export class QuotesService {
       const partnerCollection = collections[0];
 
       const requiredRegions: any = [];
+
       let point1 = {
         latitude: fromLat,
         longitude: fromLng,
@@ -313,6 +361,7 @@ export class QuotesService {
               emails.push({
                 email: partner.email,
                 companyName: partner.companyName,
+                lastRequestReceivedOn : partner.lastRequestReceivedOn,
               });
             }
           } else if (partner.areaPreference === 'radius') {
@@ -331,13 +380,17 @@ export class QuotesService {
               emails.push({
                 email: partner.email,
                 companyName: partner.companyName,
+                lastRequestReceivedOn : partner.lastRequestReceivedOn,
               });
             }
           }
         }),
       );
+    
+    const sortedEmails = emails.sort((a, b) => a.lastRequestReceivedOn - b.lastRequestReceivedOn)
 
-      return emails;
+
+      return sortedEmails.slice(0,3);
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
