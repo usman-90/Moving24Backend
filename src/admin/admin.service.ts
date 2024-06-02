@@ -49,28 +49,27 @@ export class AdminService {
     }
   }
 
-  async getAdminDetails(
-    id: string,
-    projectionObj: any,
-  ): Promise<any | undefined> {
-    try {
-      const collections = await database_connection(['Admin']);
-      if (!collections) {
-        return;
-      }
-      const partnerCollection = collections[0];
-      const result = partnerCollection.findOne(
-        { _id: new ObjectId(id) },
-        { projection: projectionObj },
-      );
+    async getAdminDetails(id: string, projectionObj: any): Promise<any | undefined> {
+        try {
 
-      return result;
-    } catch (e) {
-      console.log(e);
-      throw new InternalServerErrorException();
+            const collections = await database_connection(["Admin"])
+            if (!collections) {
+                return
+            }
+            const partnerCollection = collections[0]
+            const result = partnerCollection.findOne(
+                { _id: new ObjectId(id) },
+                { projection: projectionObj }
+
+            );
+
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
     }
-  }
-
+  
   async updateAdminDetails(id: string, body: any): Promise<any | undefined> {
     try {
       const collections = await database_connection(['Admin']);
@@ -91,26 +90,77 @@ export class AdminService {
     }
   }
 
-  async updateAdminPassword(id: string, body: any): Promise<any | undefined> {
-    try {
-      const collections = await database_connection(['Admin']);
-      if (!collections) {
-        return;
-      }
-      console.log(body);
-      const partnerCollection = collections[0];
-      const result = partnerCollection.updateOne(
-        { _id: new ObjectId(id) },
-        {
-          $set: {
-            password: await hashPassword(body.password),
-          },
-        },
-      );
-      return result;
-    } catch (e) {
-      console.log(e);
-      throw new InternalServerErrorException();
+
+
+    async getMinimumBudget(): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["WebsiteData"])
+            if (!collections) {
+                return
+            }
+            const websiteDataCollection = collections[0]
+            const result = websiteDataCollection.findOne(
+                { name: "minimumBudgetRange" },
+            );
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+
+    async updateMinimumBudget(minimumBudgetRange: string): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["WebsiteData"])
+            if (!collections) {
+                return
+            }
+            const websiteDataCollection = collections[0]
+            console.log(minimumBudgetRange)
+            const result = websiteDataCollection.updateOne(
+                { name: "minimumBudgetRange" },
+                {
+                    $set: {
+                        minimumBudgetRange: parseInt(minimumBudgetRange)
+                    }
+                },
+                { upsert: true }
+            );
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+    async updateAdminPassword(id: string, body: any): Promise<any | undefined> {
+        try {
+
+            const collections = await database_connection(["Admin"])
+            if (!collections) {
+                return
+            }
+            console.log(body)
+            const partnerCollection = collections[0]
+            const result = partnerCollection.updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $set: {
+                        password: await hashPassword(body.password)
+                    }
+                }
+            );
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
     }
   }
-}
+

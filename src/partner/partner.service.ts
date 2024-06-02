@@ -251,6 +251,67 @@ export class PartnerService {
         }
     }
 
+    async getPartnerProofsById(id: string): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["Partner"])
+
+            if (!collections) {
+                return
+            }
+            console.log(id)
+            const partnerCollection = collections[0]
+            const result = partnerCollection.findOne({
+                _id : new ObjectId(id),
+            }, {
+                proof: 1
+            })
+            console.log(result)
+            return result
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+
+    async updatePartnerProofs(id: string, proofs: any): Promise<any | undefined> {
+        try {
+            const collections = await database_connection(["Partner"])
+            console.log(proofs)
+
+            if (!collections) {
+                return
+            }
+
+            console.log(id)
+            const partnerCollection = collections[0]
+    
+            const res = await partnerCollection.findOne({
+                _id : new ObjectId(id),
+            }, {
+                proof: 1
+            })
+            const mongoQuery = {
+                    $set : {
+                        proof : {... res?.proof, ...proofs},
+                        isVerified : false
+                    }
+            }
+            const result = await partnerCollection.updateOne(
+                { _id: new ObjectId(id) },
+                mongoQuery
+            );
+
+            return result
+
+        } catch (e) {
+            console.log(e)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
     async saveToPartner(id: string, emails: string[]): Promise<any | undefined> {
         try {
             if (!emails.length) {

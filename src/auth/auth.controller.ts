@@ -19,12 +19,6 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('partnerSignUp')
-  partnerSignUp(@Body() signInDto: Record<string, any>) {
-    return this.authService.partnerSignUp(signInDto);
-  }
-
-  @HttpCode(HttpStatus.OK)
   @Post('adminLogin')
   adminSignIn(@Body() signInDto: Record<string, any>) {
     return this.authService.adminSignIn(signInDto.password, signInDto.email);
@@ -35,6 +29,13 @@ export class AuthController {
   adminSignUp(@Body() signInDto: Record<string, any>) {
     return this.authService.adminSignUp(signInDto);
   }
+
+
+    @HttpCode(HttpStatus.OK)
+    @Post('partnerSignUp')
+    partnerSignUp(@Body() signInDto: Record<string, any>) {
+        return this.authService.partnerSignUp(signInDto);
+    }
 
   @HttpCode(HttpStatus.OK)
   @Post('sendVerificationCode')
