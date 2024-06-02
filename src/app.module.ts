@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
+var cron = require('node-cron');
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Moving24Controller } from './moving24.controller';
@@ -12,10 +13,28 @@ import { QuotesModule } from './quotes/quotes.module';
 import { RegionsService } from './regions/regions.service';
 import { RegionsController } from './regions/regions.controller';
 import { AdminModule } from './admin/admin.module';
+import { PartnerController } from './partner/partner.controller';
+import { PartnerService } from './partner/partner.service';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UsersModule, PartnerModule, QuotesModule, AdminModule],
-  controllers: [AppController, Moving24Controller, RegionsController],
-  providers: [AppService, UsersService, MailerService, RegionsService],
+    imports: [
+        ConfigModule.forRoot(),
+        AuthModule,
+        UsersModule,
+        PartnerModule,
+        QuotesModule,
+        AdminModule,
+        PartnerModule
+    ],
+    controllers: [AppController, Moving24Controller, RegionsController],
+    providers: [AppService, UsersService, MailerService, RegionsService, PartnerService],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+    constructor(private readonly partnerService: PartnerService) { }
+
+    onModuleInit() {
+    cron.schedule('0 0 * * *', () => {
+        this.partnerService.sendExpirationAlerts();
+    });
+    }
+}

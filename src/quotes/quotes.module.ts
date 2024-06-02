@@ -7,6 +7,6 @@ import { PartnerService } from '../partner/partner.service';
 
 @Module({
   controllers: [QuotesController],
-  providers: [QuotesService,RegionsService, MailerService,PartnerService]
+  providers: [QuotesService, RegionsService, MailerService, PartnerService],
 })
 export class QuotesModule {}

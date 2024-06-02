@@ -4,16 +4,15 @@ import { PartnerService } from '../partner/partner.service';
 
 @Injectable()
 export class CheckPartnerEmailMiddleware implements NestMiddleware {
-    constructor(private parnterService: PartnerService) { }
-    async use(req: Request, res: Response, next: NextFunction) {
-        const email = req.body.email;
-        const user = this.parnterService.getPartnerByEmail(email);
-        const userRes = await user;
-        if (userRes) {
-            res.status(400).json({ message: 'Email already exists' });
-            return;
-        }
-        next();
+  constructor(private parnterService: PartnerService) {}
+  async use(req: Request, res: Response, next: NextFunction) {
+    const email = req.body.email;
+    const user = this.parnterService.getPartnerByEmail(email);
+    const userRes = await user;
+    if (userRes) {
+      res.status(400).json({ message: 'Email already exists' });
+      return;
     }
+    next();
+  }
 }
-

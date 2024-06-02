@@ -1,1 +1,1 @@
-declare module "point-in-polygon" 
+declare module 'point-in-polygon';

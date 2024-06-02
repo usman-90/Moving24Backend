@@ -6,8 +6,8 @@ import { RegionsService } from '../regions/regions.service';
 import { AdminService } from '../admin/admin.service';
 
 @Module({
-    providers:[UsersService,AdminService, QuotesService, RegionsService],
-    exports:[UsersService],
-    controllers: [UsersController]
+  providers: [UsersService, AdminService, QuotesService, RegionsService],
+  exports: [UsersService],
+  controllers: [UsersController],
 })
 export class UsersModule {}
