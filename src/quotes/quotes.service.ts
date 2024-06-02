@@ -299,6 +299,7 @@ export class QuotesService {
       const partnerCollection = collections[0];
 
       const requiredRegions: any = [];
+
       let point1 = {
         latitude: fromLat,
         longitude: fromLng,
@@ -360,6 +361,7 @@ export class QuotesService {
               emails.push({
                 email: partner.email,
                 companyName: partner.companyName,
+                lastRequestReceivedOn : partner.lastRequestReceivedOn,
               });
             }
           } else if (partner.areaPreference === 'radius') {
@@ -378,13 +380,17 @@ export class QuotesService {
               emails.push({
                 email: partner.email,
                 companyName: partner.companyName,
+                lastRequestReceivedOn : partner.lastRequestReceivedOn,
               });
             }
           }
         }),
       );
+    
+    const sortedEmails = emails.sort((a, b) => a.lastRequestReceivedOn - b.lastRequestReceivedOn)
 
-      return emails;
+
+      return sortedEmails.slice(0,3);
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();

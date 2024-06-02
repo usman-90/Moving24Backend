@@ -53,6 +53,13 @@ export class QuotesController {
       console.log(emails, 'Emails');
       const requestDetails = await this.quoteService.getOnePartnerById(body.id);
       await this.partnerService.saveToPartner(body.id, emails);
+      
+      const updateLastReqReceivedDate = emails.map((elem) => {
+          return this.partnerService.updateLastReceivedDate(elem)
+      }) 
+      console.log(updateLastReqReceivedDate)
+
+      await Promise.all(updateLastReqReceivedDate)
 
       if (partnersToSend?.length) {
         partnersToSend?.forEach(async (email: any) => {
