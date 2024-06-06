@@ -47,6 +47,31 @@ export class AdminController {
     return res;
   }
 
+  //    @UseGuards(AuthGuard, RolesGuard)
+  //    @Roles(["admin"])
+  @HttpCode(HttpStatus.OK)
+  @Get('getWeeklyQuotations')
+  async getWeeklyRequests(@Req() req: any) {
+    const projectObj = {
+      _id: 1,
+      moveFrom: 1,
+      moveTo: 1,
+      email: 1,
+      name: 1,
+      requestTime: 1,
+      availablePartners: 1,
+    };
+    console.log(req?.query?.setNo,1)
+    console.log(req?.query?.searchQuery,2)
+    console.log(req?.query?.week,3)
+    const res = await this.quoteService.getWeeklyQuotation(
+      req?.query?.setNo,
+      projectObj,
+      req?.query?.searchQuery,
+      parseInt(req?.query?.week?.split("-")[1])
+    );
+    return res;
+  }
 
 
     //    @UseGuards(AuthGuard, RolesGuard)
